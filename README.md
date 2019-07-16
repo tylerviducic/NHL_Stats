@@ -1,2 +1,4 @@
 # NHL_Stats
-NHL API Scraper Python Interface
+NHL API Scraper with Python Interface
+
+By Tyler Viducic
