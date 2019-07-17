@@ -78,7 +78,8 @@ for game_play in game.game_plays:
 for player in game.get_team_by_name("New Jersey Devils").team_players:
     player.show_stats()
 
-
+for player in game.get_team_by_name("New York Rangers").team_players:
+    player.show_stats()
 
 
 
