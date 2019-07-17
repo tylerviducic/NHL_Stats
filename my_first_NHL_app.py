@@ -42,7 +42,7 @@ for game in games:
 
 s = requests.get(game_link)
 game_feed = s.json()
-print(game_feed)
+#print(game_feed)
 
 nyd = scrap.Roster('New Jersey Devils')
 nyr = scrap.Roster('New York Rangers')
