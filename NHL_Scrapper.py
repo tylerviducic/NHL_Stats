@@ -1,7 +1,7 @@
 import requests
 import datetime
 
-class Schedule:
+class Daily_Schedule:
     def __int__(self):
         self.games = []
 
