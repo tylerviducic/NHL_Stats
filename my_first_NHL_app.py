@@ -59,6 +59,7 @@ game = scrap.Game(nyd, nyr, game_feed)
 #         nyr.team_players.append(plr)
 #
 # game = scrap.Game(nyd, nyr)
+#
 
 plays = game_feed['liveData']['plays']['allPlays']
 
