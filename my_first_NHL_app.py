@@ -61,19 +61,19 @@ game = scrap.Game(nyd, nyr, game_feed)
 # game = scrap.Game(nyd, nyr)
 
 
-plays = game_feed['liveData']['plays']['allPlays']
+#plays = game_feed['liveData']['plays']['allPlays']
 
 #Start here after you have both rosters set. Iterate over the events. Document all the possible playerTypes.
 #assign stats based on what happens there.
 
 
-for play in plays:
-    if 'players' in play.keys():
-        game.add_play(scrap.Play(play))
+# for play in plays:
+#     if 'players' in play.keys():
+#         game.add_play(scrap.Play(play))
 
 
 for game_play in game.game_plays:
-    game_play.parse_play(game)
+    game_play.parse_play(game.teams)
 
 for player in game.get_team_by_name("New Jersey Devils").team_players:
     player.show_stats()

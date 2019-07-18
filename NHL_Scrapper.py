@@ -2,7 +2,7 @@ import requests
 import datetime
 
 class Daily_Schedule:
-    def __int__(self):
+    def __int__(self, year, month, day):
         self.games = []
 
     def get_games(self):
@@ -10,7 +10,7 @@ class Daily_Schedule:
 
 class Game:
 
-    def __int__(self):
+    def __init__(self):
         self.teams = ()
         self.game_plays = []
 
@@ -19,8 +19,9 @@ class Game:
         self.game_plays = []
         self.fill_rosters(game_feed['gameData']['players'])
         for play in game_feed['liveData']['plays']['allPlays']:
-            if 'player' in play.keys():
-                self.add_play(play)
+            if 'players' in play.keys():
+                self.add_play(Play(play))
+        print(self.game_plays)
 
     def add_teams(self, roster1, roster2):
         self.teams = (roster1, roster2)
@@ -42,7 +43,7 @@ class Game:
                 return team
         return Roster("Invalid")
 
-    def is_team(self, name):
+    def is_team_in_game(self, name):
         for team in self.teams:
             if team.team_name == name:
                 return True
@@ -168,8 +169,8 @@ class Play:
             self.event = play_dict['result']['event']
             self.play_coordinates.update(play_dict['coordinates'])
 
-    def parse_play(self, game):
-        for team in game.teams:
+    def parse_play(self, teams):
+        for team in teams:
             for player in self.players:
                 if team.on_team(player['Name']):
                     team.team_players[team.get_player(player['Name'])].update_stats(self.event, player['Type'])
