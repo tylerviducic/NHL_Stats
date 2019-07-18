@@ -34,7 +34,7 @@ for game in games:
     # print('home team:  ' + home_team['team']['name'])
     # print('away team:  ' + str(away_team))
     if 'New Jersey Devils' == home_team['team']['name'] or 'New Jersey Devils' == away_team['team']['name']:
-        print('found game')
+        #print('found game')
         #print(game)
         # print(home_team['team']['name'] + ': ' + str(home_team['score']) + "  " + away_team['team']['name'] + ':  ' +
         #       str(away_team['score']))

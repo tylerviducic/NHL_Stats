@@ -24,7 +24,6 @@ class Game:
         for play in game_feed['liveData']['plays']['allPlays']:
             if 'players' in play.keys():
                 self.add_play(Play(play))
-        print(self.game_plays)
 
     def add_teams(self, roster1, roster2):
         self.teams = (roster1, roster2)
