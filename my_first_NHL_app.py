@@ -1,5 +1,5 @@
 import requests
-import NHL_Scrapper as scrap
+import NHL_Scraper as scrap
 
 
 # r = requests.get("https://statsapi.web.nhl.com/api/v1/teams/1/roster")
