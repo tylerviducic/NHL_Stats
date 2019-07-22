@@ -7,6 +7,7 @@ class DailySchedule:
     def __init__(self, year, month, day):
         self.games = []
         self.date = datetime.date(year, month, day)
+        self.get_daily_games()
 
     def get_daily_games(self):
         r = requests.get('https://statsapi.web.nhl.com/api/v1/schedule/?date={0}'.format(self.date))
@@ -31,14 +32,14 @@ class DailySchedule:
     # Private Methods
 
     @staticmethod
-    def __get_teams__(self, game):
+    def __get_teams__(game):
         home_team = Roster(game['teams']['home']['team']['name'])
         away_team = Roster(game['teams']['away']['team']['name'])
         return {'homeTeam': home_team,
                 'awayTeam': away_team}
 
     @staticmethod
-    def __get_gamefeed__(self, game):
+    def __get_gamefeed__(game):
         gamelink = 'http://statsapi.web.nhl.com' + game['link']
         return requests.get(gamelink).json()
 

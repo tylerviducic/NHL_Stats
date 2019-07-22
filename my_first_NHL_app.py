@@ -19,36 +19,36 @@ import NHL_Scraper as scrap
 #     if person['person']['fullName'] == 'Taylor Hall':
 #         print('8 More Years')
 
-p = requests.get('https://statsapi.web.nhl.com/api/v1/schedule/?date=2019-04-01')
-json_dict = p.json()
-
-game_link = ''
-
-#print(json_dict['dates'][0]['games'])
-games = json_dict['dates'][0]['games']
-for game in games:
-    # print('game')
-    #print(game['teams'])
-    home_team = game['teams']['home']
-    away_team = game['teams']['away']
-    # print('home team:  ' + home_team['team']['name'])
-    # print('away team:  ' + str(away_team))
-    if 'New Jersey Devils' == home_team['team']['name'] or 'New Jersey Devils' == away_team['team']['name']:
-        #print('found game')
-        #print(game)
-        # print(home_team['team']['name'] + ': ' + str(home_team['score']) + "  " + away_team['team']['name'] + ':  ' +
-        #       str(away_team['score']))
-        game_link = 'http://statsapi.web.nhl.com' + game['link']
-
-s = requests.get(game_link)
-game_feed = s.json()
+# p = requests.get('https://statsapi.web.nhl.com/api/v1/schedule/?date=2019-04-01')
+# json_dict = p.json()
+#
+# game_link = ''
+#
+# #print(json_dict['dates'][0]['games'])
+# games = json_dict['dates'][0]['games']
+# for game in games:
+#     # print('game')
+#     #print(game['teams'])
+#     home_team = game['teams']['home']
+#     away_team = game['teams']['away']
+#     # print('home team:  ' + home_team['team']['name'])
+#     # print('away team:  ' + str(away_team))
+#     if 'New Jersey Devils' == home_team['team']['name'] or 'New Jersey Devils' == away_team['team']['name']:
+#         #print('found game')
+#         #print(game)
+#         # print(home_team['team']['name'] + ': ' + str(home_team['score']) + "  " + away_team['team']['name'] + ':  ' +
+#         #       str(away_team['score']))
+#         game_link = 'http://statsapi.web.nhl.com' + game['link']
+#
+# s = requests.get(game_link)
+# game_feed = s.json()
 #print(game_feed)
 
-nyd = scrap.Roster('New Jersey Devils')
-nyr = scrap.Roster('New York Rangers')
+# nyd = scrap.Roster('New Jersey Devils')
+# nyr = scrap.Roster('New York Rangers')
 # game_players = game_feed['gameData']['players']
 
-game = scrap.Game(nyd, nyr, game_feed)
+# game = scrap.Game(nyd, nyr, game_feed)
 
 
 # for plur in game_players:
@@ -70,15 +70,18 @@ game = scrap.Game(nyd, nyr, game_feed)
 # for play in plays:
 #     if 'players' in play.keys():
 #         game.add_play(scrap.Play(play))
+daily_games = scrap.DailySchedule(2019, 4, 1)
+if daily_games.did_team_play('New Jersey Devils'):
+    devils_game = daily_games.get_game_by_teamname('New Jersey Devils')
 
 
-for game_play in game.game_plays:
-    game_play.parse_play(game.teams)
+for game_play in devils_game.game_plays:
+    game_play.parse_play(devils_game.teams)
 
-for player in game.get_team_by_name("New Jersey Devils").team_players:
+for player in devils_game.get_team_by_name("New Jersey Devils").team_players:
     player.show_stats()
 
-for player in game.get_team_by_name("New York Rangers").team_players:
+for player in devils_game.get_team_by_name("New York Rangers").team_players:
     player.show_stats()
 
 
