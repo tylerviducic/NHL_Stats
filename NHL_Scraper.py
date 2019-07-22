@@ -3,19 +3,47 @@ import datetime
 
 
 class DailySchedule:
+
     def __init__(self, year, month, day):
         self.games = []
         self.date = datetime.date(year, month, day)
 
-    def get_games(self):
+    def get_daily_games(self):
         r = requests.get('https://statsapi.web.nhl.com/api/v1/schedule/?date={0}'.format(self.date))
+        games_dictionary = r.json()
+        self.games = games_dictionary['dates'][0]['games']
+
+    def did_team_play(self, team_name):
+        for game in self.games:
+            teams = self.__get_teams__(game)
+            if teams['homeTeam'].team_name == team_name or teams['awayTeam'].team_name == team_name:
+                return True
+        return False
+
+    def get_game_by_teamname(self, team_name):
+        for game in self.games:
+            teams = self.__get_teams__(game)
+            if teams['homeTeam'].team_name == team_name or teams['awayTeam'].team_name == team_name:
+                gamefeed = self.__get_gamefeed__(game)
+                return Game(Roster(teams['homeTeam'].team_name), Roster(teams['awayTeam'].team_name), gamefeed)
+        return
+
+    # Private Methods
+
+    @staticmethod
+    def __get_teams__(self, game):
+        home_team = Roster(game['teams']['home']['team']['name'])
+        away_team = Roster(game['teams']['away']['team']['name'])
+        return {'homeTeam': home_team,
+                'awayTeam': away_team}
+
+    @staticmethod
+    def __get_gamefeed__(self, game):
+        gamelink = 'http://statsapi.web.nhl.com' + game['link']
+        return requests.get(gamelink).json()
 
 
 class Game:
-
-    def __init__(self):
-        self.teams = ()
-        self.game_plays = []
 
     def __init__(self, roster1, roster2, game_feed):
         self.teams = (roster1, roster2)
