@@ -86,7 +86,7 @@ class Player:
 
     def __init__(self, name):
         self.name = name
-        self.stats = {'shots': 0,
+        self.stats = {'shots': {'number': 0, 'locations': []},
                       'goals': 0,
                       'assists': 0,
                       'cf': 0,
@@ -103,12 +103,12 @@ class Player:
         print('{}: '.format(self.name), end='')
         print(self.stats)
 
-    def update_stats(self, event, play_type):
+    def update_stats(self, event, play_type, location):
 
         action = {
             'Faceoff': self.__update_faceoff__(play_type),
             'Hit': self.__update_hit__(play_type),
-            'Shot': self.__update_shot__(play_type),
+            'Shot': self.__update_shot__(play_type, location),
             'Blocked Shot': self.__update_shotblock__(play_type),
             'Takeaways': self.__update_takeaway__(play_type),
             'Goal': self.__update_goal__(play_type),
@@ -144,9 +144,10 @@ class Player:
         if play_type == 'Shooter':
             self.__update_shotattempt__()
 
-    def __update_shot__(self, play_type):
+    def __update_shot__(self, play_type, location):
         if play_type == 'Shooter':
-            self.stats['shots'] += 1
+            self.stats['shots']['number'] += 1
+            self.stats['shots']['locations'].append(location)
             self.__update_shotattempt__()
 
     def __update_faceoff__(self, play_type):
@@ -207,4 +208,4 @@ class Play:
         for team in teams:
             for player in self.players:
                 if team.is_player_on_team(player['Name']):
-                    team.team_players[team.get_player(player['Name'])].update_stats(self.event, player['Type'])
+                    team.team_players[team.get_player(player['Name'])].update_stats(self.event, player['Type'], self.play_coordinates)
