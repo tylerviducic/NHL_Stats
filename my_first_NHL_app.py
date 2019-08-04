@@ -1,5 +1,7 @@
 import requests
 import NHL_Scraper as scrap
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 # r = requests.get("https://statsapi.web.nhl.com/api/v1/teams/1/roster")
@@ -78,11 +80,42 @@ if daily_games.did_team_play('New Jersey Devils'):
 for game_play in devils_game.game_plays:
     game_play.parse_play(devils_game.teams)
 
-for player in devils_game.get_team_by_name("New Jersey Devils").team_players:
-    player.show_stats()
+# for player in devils_game.get_team_by_name("New Jersey Devils").team_players:
+#     # player.show_stats()
+#
+# for player in devils_game.get_team_by_name("New York Rangers").team_players:
+#    # player.show_stats()
 
-for player in devils_game.get_team_by_name("New York Rangers").team_players:
-    player.show_stats()
+devils = devils_game.get_team_by_name("New Jersey Devils")
+# for player in devils.team_players:
+#     print(player.name)
+
+rangers = devils_game.get_team_by_name("New York Rangers")
+
+devils_shots_x = []
+devils_shots_y = []
+rangers_shots_x = []
+rangers_shots_y = []
+shots = np.array(devils_shots_x, devils_shots_y)
+
+for player in devils.team_players:
+    devils_shots_x += player.get_shot_locations_x()
+    devils_shots_y += player.get_shot_locations_y()
+
+for player in rangers.team_players:
+    rangers_shots_x += player.get_shot_locations_x()
+    rangers_shots_y += player.get_shot_locations_y()
+
+
+# TODO figure out MATPLOTLIB
+fig, ax1 = plt.subplots()
+plt.title("Devils-Rangers Shot Map 4/1/19")
+ax1.plot(devils_shots_x, devils_shots_y, 'ro')
+ax1.plot(rangers_shots_x, rangers_shots_y, 'bo')
+
+
+plt.show()
+
 
 
 
