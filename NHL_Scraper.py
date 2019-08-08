@@ -51,7 +51,6 @@ class Game:
         self.teams = (roster1, roster2)
         self.game_plays = []
         self.fill_rosters(game_feed['gameData']['players'])
-        print(game_feed['gameData'])
         for play in game_feed['liveData']['plays']['allPlays']:
             if 'players' in play.keys():
                 self.add_play(Play(play))
@@ -62,16 +61,18 @@ class Game:
     def add_play(self, play):
         self.game_plays.append(play)
 
-# TODO fix bug for populating teams. "current team" isn't going to work.  Primary idea is to have it ask for user imput
     def fill_rosters(self, player_list):
         for player in player_list:
-            print(player_list[player])
             current_player = Player(player_list[player]['fullName'])
             if 'currentTeam' in player_list[player].keys() and player_list[player]['currentTeam']['name'] == self.teams[
                 0].team_name:
                 self.teams[0].team_players.append(current_player)
-            else:
+            elif 'currentTeam' in player_list[player].keys() and player_list[player]['currentTeam']['name'] == \
+                    self.teams[1].team_name:
                 self.teams[1].team_players.append(current_player)
+            else:
+                team_index = self.__ask_user_for_team__(current_player)
+                self.teams[team_index - 1].team_players.append(current_player)
 
     def get_team_by_name(self, name):
         for team in self.teams:
@@ -85,10 +86,17 @@ class Game:
                 return True
         return False
 
+    def __ask_user_for_team__(self, player):
+        while True:
+            player_team = int(input("What team is {0} on?  Enter 1 for {1} or Enter 2 for {2}: ".format(player.name,
+                self.teams[0].team_name, self.teams[1].team_name)))
+            if 3 > player_team > 0:
+                break
+        return player_team
+
 
 class Player:
 
-    # TODO make a stats class
     def __init__(self, name):
         self.name = name
         self.stats = {'shots': {'number': 0, 'locations': []},
@@ -110,40 +118,43 @@ class Player:
         print(self.stats)
 
     def update_stats(self, event, play_type, location):
-
-        action = {
-            'Faceoff': self.__update_faceoff__(play_type),
-            'Hit': self.__update_hit__(play_type),
-            'Shot': self.__update_shot__(play_type, location),
-            'Blocked Shot': self.__update_shotblock__(play_type),
-            'Takeaways': self.__update_takeaway__(play_type),
-            'Goal': self.__update_goal__(play_type),
-            'Penalty': self.__update_penalty__(play_type)
-        }
-        return action.get(event, lambda: 'invalid')
-
-    def get_shotmap(self):
-        print("is this feature needed?")
+        # this isn't working as a switch, so if/elif it is.
+        if event == 'Shot':
+            self.__update_shot__(play_type, location)
+        elif event == 'Faceoff':
+            self.__update_faceoff__(play_type)
+        elif event == 'Hit':
+            self.__update_hit__(play_type)
+        elif event == 'Blocked Shot':
+            self.__update_shotblock__(play_type)
+        elif event == 'Takeaways':
+            self.__update_takeaway__(play_type)
+        elif event == 'Goal':
+            self.__update_goal__(play_type)
+        elif event == 'Penalty':
+            self.__update_penalty__(play_type)
+        elif event == 'Missed Shot':
+            self.__update_shotattempt__()
 
     def get_shot_locations(self):
         # should I make this a tuple?
-        return [self.__get_shot_locations_x__(), self.__get_shot_locations_y__()]
+        return [self.get_shot_locations_x(), self.get_shot_locations_y()]
 
-    # Private Methods
-
-    def __get_shot_locations_x__(self):
+    def get_shot_locations_x(self):
         shot_locations_x = []
-        locations = self.get_shot_locations()
+        locations = self.stats['shots']['locations']
         for location in locations:
             shot_locations_x.append(location['x'])
         return shot_locations_x
 
-    def __get_shot_locations_y__(self):
+    def get_shot_locations_y(self):
         shot_locations_y = []
-        locations = self.get_shot_locations()
+        locations = self.stats['shots']['locations']
         for location in locations:
             shot_locations_y.append(location['y'])
         return shot_locations_y
+
+    # Private Methods
 
     def __update_penalty__(self, player_type):
         if player_type == 'PenaltyOn':
@@ -172,6 +183,7 @@ class Player:
             self.__update_shotattempt__()
 
     def __update_shot__(self, play_type, location):
+        print('Updating shot')
         if play_type == 'Shooter':
             self.stats['shots']['number'] += 1
             self.__update_shot_location(location)
@@ -203,7 +215,7 @@ class Roster:
                            "penalties": 0,
                            "faceoffs_taken": 0,
                            "faceoffs_won": 0,
-                           "shots": 0,
+                           "shots": {'number': 0, 'locations': []},
                            "goals": 0}
 
     def is_player_on_team(self, potential_player_name):
@@ -212,7 +224,13 @@ class Roster:
                 return True
         return False
 
-    def get_player(self, potential_player_name):
+    def get_player_by_name(self, potential_player_name):
+        for player in self.team_players:
+            if player.name == potential_player_name:
+                return player
+        return "Invalid"
+
+    def get_player_index(self, potential_player_name):
         for player in self.team_players:
             if player.name == potential_player_name:
                 return self.team_players.index(player)
@@ -220,10 +238,19 @@ class Roster:
 
     def update_team_stats(self):
         for player in self.team_players:
-            x = 69
+            self.__update_shots__(player)
+            self.__update_goals__(player)
+            self.__update_faceoffs__(player)
+
+    def show_team_stats(self):
+        print('Stats for {0}: \n\tShots: {1} \n\tGoals: {2}\n\tFaceoff Win%: {3}'.format(self.team_name, self.team_stats['shots']['number']
+            , self.team_stats['goals'], (self.team_stats['faceoffs_won']/self.team_stats['faceoffs_taken']) * 100))
+
+    # Private methods
 
     def __update_shots__(self, player):
-        self.team_stats['shots'] += player.stats['shots']
+        self.team_stats['shots']['number'] += player.stats['shots']['number']
+        self.team_stats['shots']['locations'] += player.stats['shots']['locations']
 
     def __update_goals__(self, player):
         self.team_stats['goals'] += player.stats['goals']
@@ -240,16 +267,21 @@ class Play:
         self.event = ''
         self.play_coordinates = {'x': 0,
                                  'y': 0}
+        self.__add_plays__(play_dict)
 
+    def parse_play(self, teams):
+        for team in teams:
+            for player in self.players:
+                if team.is_player_on_team(player['Name']):
+                    # team.team_players[team.get_player_index(player['Name'])].update_stats(self.event, player['Type'],
+                        #self.play_coordinates)
+                    team.get_player_by_name(player['Name']).update_stats(self.event, player['Type'], self.play_coordinates)
+
+    def __add_plays__(self, play_dict):
+        print(play_dict)
         for player in play_dict['players']:
             player_name = player['player']['fullName']
             player_type = player['playerType']
             self.players.append({'Name': player_name, 'Type': player_type})
             self.event = play_dict['result']['event']
             self.play_coordinates.update(play_dict['coordinates'])
-
-    def parse_play(self, teams):
-        for team in teams:
-            for player in self.players:
-                if team.is_player_on_team(player['Name']):
-                    team.team_players[team.get_player(player['Name'])].update_stats(self.event, player['Type'], self.play_coordinates)

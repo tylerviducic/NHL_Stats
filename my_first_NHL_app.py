@@ -89,29 +89,31 @@ for game_play in devils_game.game_plays:
 devils = devils_game.get_team_by_name("New Jersey Devils")
 # for player in devils.team_players:
 #     print(player.name)
+devils.update_team_stats()
+devils.show_team_stats()
 
 rangers = devils_game.get_team_by_name("New York Rangers")
 
 devils_shots_x = []
 devils_shots_y = []
-rangers_shots_x = []
-rangers_shots_y = []
-shots = np.array(devils_shots_x, devils_shots_y)
+rangers_shots = [[], []]
+
 
 for player in devils.team_players:
-    devils_shots_x += player.get_shot_locations_x()
-    devils_shots_y += player.get_shot_locations_y()
+    devils_shots_x, devils_shots_y = player.get_shot_locations()
+    print(devils_shots_x)
+    print(devils_shots_y)
+    print('# ' * 40)
 
 for player in rangers.team_players:
-    rangers_shots_x += player.get_shot_locations_x()
-    rangers_shots_y += player.get_shot_locations_y()
+    rangers_shots += player.get_shot_locations()
 
 
 # TODO figure out MATPLOTLIB
 fig, ax1 = plt.subplots()
 plt.title("Devils-Rangers Shot Map 4/1/19")
-ax1.plot(devils_shots_x, devils_shots_y, 'ro')
-ax1.plot(rangers_shots_x, rangers_shots_y, 'bo')
+# ax1.plot(np.array(devils_shots), 'ro')
+# ax1.plot(np.array(rangers_shots), 'bo')
 
 
 plt.show()
