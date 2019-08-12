@@ -2,6 +2,7 @@
 NHL API Scraper with Python Interface
 
 In development. Currently can only access data stored in the NHL's API.  There are many limitations with this
+_____________________________________________________________________________________________________________
 
 
 Current Functional Classes:
@@ -19,7 +20,7 @@ TeamStats - team stats
 Game - contains the teams and plays for a game
 
 DailySchedule - games played for a given date
-
+_____________________________________________________________________________________________________________
 
 
 More detailed documentation to come
