@@ -4,7 +4,7 @@ NHL API Scraper with Python Interface
 In development. Currently can only access data stored in the NHL's API.  There are many limitations with this
 
 Current Functional Classes:
-Play - key information for a given play
+Play - key information for a given play\n
 Player - key infomation for a player 
 PlayerStats - player stats
 Roster - information for a team
