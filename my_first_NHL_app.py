@@ -87,7 +87,8 @@ for game_play in devils_game.game_plays:
 #    # player.show_stats()
 
 devils = devils_game.get_team_by_name("New Jersey Devils")
-# for player in devils.team_players:
+for player in devils.team_players:
+    player.show_stats()
 #     print(player.name)
 devils.update_team_stats()
 devils.show_team_stats()
@@ -100,10 +101,9 @@ rangers_shots = [[], []]
 
 
 for player in devils.team_players:
-    devils_shots_x, devils_shots_y = player.get_shot_locations()
-    print(devils_shots_x)
-    print(devils_shots_y)
-    print('# ' * 40)
+    current_devils_shots_x, current_devils_shots_y = player.get_shot_locations()
+    devils_shots_x += current_devils_shots_x
+    devils_shots_y += current_devils_shots_y
 
 for player in rangers.team_players:
     rangers_shots += player.get_shot_locations()
@@ -111,8 +111,11 @@ for player in rangers.team_players:
 
 # TODO figure out MATPLOTLIB
 fig, ax1 = plt.subplots()
+img = plt.imread('hockey_rink.jpeg')
+ax1.imshow(img, extent=[-100, 100, -43, 43])
 plt.title("Devils-Rangers Shot Map 4/1/19")
-# ax1.plot(np.array(devils_shots), 'ro')
+devils_shots = (devils_shots_y, devils_shots_y)
+ax1.plot(devils_shots_x, devils_shots_y, 'ro')
 # ax1.plot(np.array(rangers_shots), 'bo')
 
 
