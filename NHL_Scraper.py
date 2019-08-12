@@ -5,7 +5,8 @@ import matplotlib.pyplot as mp
 
 # Created by Tyler Viducic
 # I should be doing my research instead
-# TODO move parse_play to Game class
+# TODO split classes into unique files
+# TODO add a season class for full season player analysis
 
 class Play:
 
@@ -140,7 +141,6 @@ class Player:
     def get_shot_locations(self):
         return self.get_shot_locations_x(), self.get_shot_locations_y()
 
-# TODO figure out why devils have 41 shots but 47 shots plotted
     def get_shot_locations_x(self):
         shot_locations_x = []
         shots = self.stats.shots
@@ -261,10 +261,17 @@ class TeamStats:
 class Roster:
 
     # TODO add a shotmap function
-    def __init__(self, team_name):
+    def __init__(self, team_name, home_away):
+        self.home_away = home_away
         self.team_name = team_name
         self.team_players = []
         self.team_stats = TeamStats()
+
+    def is_home(self):
+        if self.home_away == 'home':
+            return True
+        else:
+            return False
 
     def is_player_on_team(self, potential_player_name):
         for player in self.team_players:
@@ -334,15 +341,15 @@ class DailySchedule:
             teams = self.__get_teams__(game)
             if teams['homeTeam'].team_name == team_name or teams['awayTeam'].team_name == team_name:
                 gamefeed = self.__get_gamefeed__(game)
-                return Game(Roster(teams['homeTeam'].team_name), Roster(teams['awayTeam'].team_name), gamefeed)
+                return Game(Roster(teams['homeTeam'].team_name, 'home'), Roster(teams['awayTeam'].team_name, 'away'), gamefeed)
         return
 
     # Private Methods
 
     @staticmethod
     def __get_teams__(game):
-        home_team = Roster(game['teams']['home']['team']['name'])
-        away_team = Roster(game['teams']['away']['team']['name'])
+        home_team = Roster(game['teams']['home']['team']['name'], 'home')
+        away_team = Roster(game['teams']['away']['team']['name'], 'away')
         return {'homeTeam': home_team,
                 'awayTeam': away_team}
 
@@ -361,6 +368,7 @@ class Game:
         for play in game_feed['liveData']['plays']['allPlays']:
             if 'players' in play.keys():
                 self.add_play(Play(play))
+        self.__parse_plays__()
 
     def add_teams(self, roster1, roster2):
         self.teams = (roster1, roster2)
@@ -400,3 +408,7 @@ class Game:
             if 3 > player_team > 0:
                 break
         return player_team
+
+    def __parse_plays__(self):
+        for play in self.game_plays:
+            play.parse_play(self.teams)

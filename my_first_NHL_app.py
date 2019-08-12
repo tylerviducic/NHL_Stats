@@ -77,8 +77,8 @@ if daily_games.did_team_play('New Jersey Devils'):
     devils_game = daily_games.get_game_by_teamname('New Jersey Devils')
 
 
-for game_play in devils_game.game_plays:
-    game_play.parse_play(devils_game.teams)
+# for game_play in devils_game.game_plays:
+#     game_play.parse_play(devils_game.teams)
 
 # for player in devils_game.get_team_by_name("New Jersey Devils").team_players:
 #     # player.show_stats()
@@ -93,7 +93,7 @@ for player in devils.team_players:
 devils.update_team_stats()
 devils.show_team_stats()
 
-rangers = devils_game.get_team_by_name("New York Rangers")
+# rangers = devils_game.get_team_by_name("New York Rangers")
 
 devils_shots_x = []
 devils_shots_y = []
@@ -106,15 +106,15 @@ for player in devils.team_players:
     devils_shots_y += current_devils_shots_y
 
 
-for player in rangers.team_players:
-    rangers_shots += player.get_shot_locations()
+# for player in rangers.team_players:
+#     rangers_shots += player.get_shot_locations()
 
 
 # TODO figure out MATPLOTLIB
 fig, ax1 = plt.subplots()
 img = plt.imread('hockey_rink.jpeg')
 ax1.imshow(img, extent=[-100, 100, -43, 43])
-plt.title("Devils-Rangers Shot Map 4/1/19")
+plt.title("{}-{} Shot Map {}".format(devils_game.teams[0].team_name, devils_game.teams[1].team_name, daily_games.date))
 devils_shots = (devils_shots_y, devils_shots_y)
 ax1.plot(devils_shots_x, devils_shots_y, 'ro')
 # ax1.plot(np.array(rangers_shots), 'bo')
