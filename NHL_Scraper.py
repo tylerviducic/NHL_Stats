@@ -140,18 +140,25 @@ class Player:
     def get_shot_locations(self):
         return self.get_shot_locations_x(), self.get_shot_locations_y()
 
+# TODO figure out why devils have 41 shots but 47 shots plotted
     def get_shot_locations_x(self):
         shot_locations_x = []
         shots = self.stats.shots
         for shot in shots:
-            shot_locations_x.append(shot['location'])
+            if shot['period'] == 2:
+                shot_locations_x.append(-shot['location']['x'])
+            else:
+                shot_locations_x.append(shot['location']['x'])
         return shot_locations_x
 
     def get_shot_locations_y(self):
         shot_locations_y = []
         shots = self.stats.shots
         for shot in shots:
-            shot_locations_y.append(shot['location'])
+            if shot['period'] == 2:
+                shot_locations_y.append(-shot['location']['y'])
+            else:
+                shot_locations_y.append(shot['location']['y'])
         return shot_locations_y
 
         # Private Methods
@@ -285,7 +292,7 @@ class Roster:
 
     def show_team_stats(self):
         print('Stats for {0}: \n\tShots: {1} \n\tGoals: {2}\n\tFaceoff Win%: {3}'.format(self.team_name,
-            len(self.team_stats.shots), len(self.team_stats.goals),
+            len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
             (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100))
 
     # Private methods

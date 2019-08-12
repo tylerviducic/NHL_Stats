@@ -105,6 +105,7 @@ for player in devils.team_players:
     devils_shots_x += current_devils_shots_x
     devils_shots_y += current_devils_shots_y
 
+
 for player in rangers.team_players:
     rangers_shots += player.get_shot_locations()
 
