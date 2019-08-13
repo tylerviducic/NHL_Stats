@@ -21,8 +21,6 @@ class Play:
         for team in teams:
             for player in self.players:
                 if team.is_player_on_team(player['Name']):
-                    # team.team_players[team.get_player_index(player['Name'])].update_stats(self.event, player['Type'],
-                    # self.play_coordinates)
                     team.get_player_by_name(player['Name']).update_stats(self.event, player['Type'], self.period,
                         self.play_coordinates)
 
@@ -94,18 +92,6 @@ class Player:
     def __init__(self, name):
         self.name = name
         self.stats = PlayerStats()
-        # self.stats = {'shots': {'number': 0, 'period': 0, 'locations': []},
-        #               'goals': {'number': 0, 'period': 0, 'locations': []},
-        #               'assists': 0,
-        #               'cf': 0,
-        #               'hits': 0,
-        #               'blocks': 0,
-        #               'faceoffs_taken': 0,
-        #               'faceoffs_won': 0,
-        #               'takeaways': 0,
-        #               'fights': 0,
-        #               'pen_drawn': 0,
-        #               'pen_taken': 0}
 
     def show_stats(self):
         # RIP this absolute beauty print({}.format(self.name), end = '')
