@@ -245,7 +245,6 @@ class TeamStats:
 class Roster:
 
     # TODO add a shotmap function
-    # TODO add team ID for player search
     def __init__(self, team_name, home_away, team_id):
         self.home_away = home_away
         self.team_name = team_name
@@ -314,7 +313,6 @@ class DailySchedule:
         r = requests.get('https://statsapi.web.nhl.com/api/v1/schedule/?date={0}'.format(self.date))
         games_dictionary = r.json()
         self.games = games_dictionary['dates'][0]['games']
-        print(self.games[0]['teams'])
 
     def did_team_play(self, team_name):
         for game in self.games:
@@ -328,8 +326,7 @@ class DailySchedule:
             teams = self.__get_teams__(game)
             if teams['homeTeam'].team_name == team_name or teams['awayTeam'].team_name == team_name:
                 gamefeed = self.__get_gamefeed__(game)
-                return Game(Roster(teams['homeTeam'].team_name, 'home', teams['homeTeam'].id), \
-                    Roster(teams['awayTeam'].team_name, 'away', teams['awayTeam'].id), gamefeed)
+                return Game(gamefeed)
         return
 
     # Private Methods
@@ -348,12 +345,16 @@ class DailySchedule:
 
 
 class Game:
-    # TODO use game_feed to assign rosters.
-    def __init__(self, roster1, roster2, game_feed):
-        print(game_feed['gameData']['datetime'])
+
+    def __init__(self, game_feed):
+        print(game_feed['gameData']['teams'])
         self.date = datetime.datetime.strptime(game_feed['gameData']['datetime']['dateTime'],
             '%Y-%m-%dT%H:%M:%SZ').date()
-        self.teams = (roster1, roster2)
+        away_team = Roster(game_feed['gameData']['teams']['away']['name'], 'away', game_feed['gameData']['teams']\
+            ['away']['id'])
+        home_team = Roster(game_feed['gameData']['teams']['home']['name'], 'away', game_feed['gameData']['teams'] \
+            ['home']['id'])
+        self.teams = (home_team, away_team)
         self.game_plays = []
         self.fill_rosters(game_feed['gameData']['players'])
         for play in game_feed['liveData']['plays']['allPlays']:
