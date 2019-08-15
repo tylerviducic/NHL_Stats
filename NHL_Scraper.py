@@ -102,7 +102,8 @@ class Player:
         Hits: {3:>9}
         Faceoffs: {4:>5}
         FO Won: {5:>7}
-        '''.format(len(self.stats.shots) + len(self.stats.goals), len(self.stats.goals) , self.stats.assists, self.stats.hits,
+        '''.format(len(self.stats.shots) + len(self.stats.goals), len(self.stats.goals), self.stats.assists,
+            self.stats.hits,
             self.stats.faceoffs_taken, self.stats.faceoffs_won))
 
     def update_stats(self, event, play_type, period, location):
@@ -175,7 +176,7 @@ class Player:
         if play_type == 'Shooter':
             self.__update_shotattempt__(period, location)
 
-    def __update_shot__(self, play_type, period, location,):
+    def __update_shot__(self, play_type, period, location, ):
         if play_type == 'Shooter':
             self.stats.update_shot(period, location)
             self.__update_shotattempt__(period, location)
@@ -247,9 +248,11 @@ class TeamStats:
 class Roster:
 
     # TODO add a shotmap function
-    def __init__(self, team_name, home_away):
+    # TODO add team ID for player search
+    def __init__(self, team_name, home_away, team_id):
         self.home_away = home_away
         self.team_name = team_name
+        self.id = team_id
         self.team_players = []
         self.team_stats = TeamStats()
 
@@ -314,6 +317,7 @@ class DailySchedule:
         r = requests.get('https://statsapi.web.nhl.com/api/v1/schedule/?date={0}'.format(self.date))
         games_dictionary = r.json()
         self.games = games_dictionary['dates'][0]['games']
+        print(self.games[0]['teams'])
 
     def did_team_play(self, team_name):
         for game in self.games:
@@ -327,15 +331,16 @@ class DailySchedule:
             teams = self.__get_teams__(game)
             if teams['homeTeam'].team_name == team_name or teams['awayTeam'].team_name == team_name:
                 gamefeed = self.__get_gamefeed__(game)
-                return Game(Roster(teams['homeTeam'].team_name, 'home'), Roster(teams['awayTeam'].team_name, 'away'), gamefeed)
+                return Game(Roster(teams['homeTeam'].team_name, 'home', teams['homeTeam'].id), \
+                    Roster(teams['awayTeam'].team_name, 'away', teams['awayTeam'].id), gamefeed)
         return
 
     # Private Methods
 
     @staticmethod
     def __get_teams__(game):
-        home_team = Roster(game['teams']['home']['team']['name'], 'home')
-        away_team = Roster(game['teams']['away']['team']['name'], 'away')
+        home_team = Roster(game['teams']['home']['team']['name'], 'home', game['teams']['home']['team']['id'])
+        away_team = Roster(game['teams']['away']['team']['name'], 'away', game['teams']['away']['team']['id'])
         return {'homeTeam': home_team,
                 'awayTeam': away_team}
 
@@ -372,6 +377,7 @@ class Game:
                     self.teams[1].team_name:
                 self.teams[1].team_players.append(current_player)
             else:
+                # TODO add roster search function for the season
                 team_index = self.__ask_user_for_team__(current_player)
                 self.teams[team_index - 1].team_players.append(current_player)
 
@@ -398,3 +404,20 @@ class Game:
     def __parse_plays__(self):
         for play in self.game_plays:
             play.parse_play(self.teams)
+
+
+class SeasonRoster:
+
+    def __init__(self, date=datetime.date.today()):
+        self.date = date
+        season = self.__get_season__(date)
+
+    @staticmethod
+    def __get_season__(date):
+        if date.month >= 10:
+            start_year = date.year
+            end_year = date.year + 1
+        else:
+            start_year = date.year - 1
+            end_year = date.year
+        return '{}{}'.format(start_year, end_year)
