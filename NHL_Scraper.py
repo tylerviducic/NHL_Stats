@@ -305,14 +305,13 @@ class Roster:
 class DailySchedule:
 
     def __init__(self, year, month, day):
-        self.games = []
         self.date = datetime.date(year, month, day)
-        self.get_daily_games()
+        self.games = self.get_daily_games()
 
     def get_daily_games(self):
         r = requests.get('https://statsapi.web.nhl.com/api/v1/schedule/?date={0}'.format(self.date))
         games_dictionary = r.json()
-        self.games = games_dictionary['dates'][0]['games']
+        return games_dictionary['dates'][0]['games']
 
     def did_team_play(self, team_name):
         for game in self.games:
@@ -347,7 +346,6 @@ class DailySchedule:
 class Game:
 
     def __init__(self, game_feed):
-        print(game_feed['gameData']['teams'])
         self.date = datetime.datetime.strptime(game_feed['gameData']['datetime']['dateTime'],
             '%Y-%m-%dT%H:%M:%SZ').date()
         away_team = Roster(game_feed['gameData']['teams']['away']['name'], 'away', game_feed['gameData']['teams']\
