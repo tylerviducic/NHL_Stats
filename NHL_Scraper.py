@@ -4,9 +4,7 @@ import matplotlib.pyplot as mp
 
 
 # Created by Tyler Viducic
-# I should be doing my research instead
-# TODO split classes into unique files
-# TODO add a season class for full season player analysis
+# I should be doing my research insteadclass Play:
 
 class Play:
 
@@ -32,6 +30,8 @@ class Play:
             self.event = play_dict['result']['event']
             self.play_coordinates.update(play_dict['coordinates'])
             self.period = play_dict['about']['period']
+# TODO Add goalies
+# TODO add a season class for full season player analysis
 
 
 class PlayerStats:
