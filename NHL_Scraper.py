@@ -313,6 +313,12 @@ class DailySchedule:
         games_dictionary = r.json()
         return games_dictionary['dates'][0]['games']
 
+    def show_all_games(self):
+        print('Games played on {}'.format(self.date))
+        print("*" * 45)
+        for game in self.games:
+            print('{} @ {}'.format(game['teams']['away']['team']['name'], game['teams']['home']['team']['name']))
+
     def did_team_play(self, team_name):
         for game in self.games:
             teams = self.__get_teams__(game)
