@@ -15,11 +15,15 @@ class Play:
                                  'y': 0}
         self.__add_plays__(play_dict)
 
+    # TODO make more efficient
     def parse_play(self, teams):
         for team in teams:
             for player in self.players:
                 if team.is_player_on_team(player['Name']):
                     team.get_player_by_name(player['Name']).update_stats(self.event, player['Type'], self.period,
+                        self.play_coordinates)
+                elif team.is_goalie_on_team(player['Name']):
+                    team.get_goalie_by_name(player['Name']).update_stats(self.event, player['Type'], self.period,
                         self.play_coordinates)
 
     def __add_plays__(self, play_dict):
@@ -35,11 +39,49 @@ class Play:
 # TODO Add goalies
 # TODO add a season class for full season player analysis
 
+class GoalieStats:
+
+    def __init__(self):
+        self.saves = 0
+        self.goals_against = 0
+
+    def update_saves(self):
+        self.saves += 1
+
+    def update_goals_against(self):
+        self.goals_against += 1
+
 
 class Goalie:
 
     def __init__(self, name):
         self.name = name
+        self.stats = GoalieStats()
+
+    def update_stats(self, event, play_type, period, location):
+        # this isn't working as a switch, so if/elif it is.
+        if event == 'Shot':
+            self.__update_shot__(play_type)
+        elif event == 'Goal':
+            self.__update_goal__(play_type)
+
+    def show_stats(self):
+        print(self.name + ':')
+        print('''\t\tSaves: {0:>10}
+        Goals Against: {1:>1}
+        Save %: {2:>13}
+        '''.format(self.stats.saves, self.stats.goals_against,
+            self.stats.saves/(self.stats.saves + self.stats.goals_against)))
+
+    # Private Methods
+
+    def __update_shot__(self, play_type):
+        if play_type == 'Goalie':
+            self.stats.update_saves()
+
+    def __update_goal__(self, play_type):
+        if play_type == 'Goalie':
+            self.stats.update_goals_against()
 
 
 class PlayerStats:
@@ -283,7 +325,13 @@ class Roster:
         for player in self.team_players:
             if player.name == potential_player_name:
                 return player
-        return "Invalid"
+        return None
+
+    def get_goalie_by_name(self, potential_goalie_name):
+        for goalie in self.team_goalies:
+            if goalie.name == potential_goalie_name:
+                return goalie
+        return None
 
     def get_player_index(self, potential_player_name):
         for player in self.team_players:
