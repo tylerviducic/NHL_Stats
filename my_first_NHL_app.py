@@ -113,7 +113,6 @@ for player in devils.team_players:
 #     rangers_shots += player.get_shot_locations()
 
 
-# TODO figure out MATPLOTLIB
 fig, ax1 = plt.subplots()
 img = plt.imread('bev_rink_v1.jpg')
 ax1.imshow(img, extent=[-100, 100, -43, 43])
