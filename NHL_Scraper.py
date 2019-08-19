@@ -4,7 +4,7 @@ import matplotlib.pyplot as mp
 
 
 # Created by Tyler Viducic
-# I should be doing my research instead
+# I should be doing my research insteadclass Play:
 
 class Play:
 
@@ -30,16 +30,8 @@ class Play:
             self.event = play_dict['result']['event']
             self.play_coordinates.update(play_dict['coordinates'])
             self.period = play_dict['about']['period']
-
-
 # TODO Add goalies
 # TODO add a season class for full season player analysis
-
-
-class Goalie:
-
-    def __init__(self, name):
-        self.name = name
 
 
 class PlayerStats:
@@ -258,7 +250,6 @@ class Roster:
         self.team_name = team_name
         self.id = team_id
         self.team_players = []
-        self.team_goalies = []
         self.team_stats = TeamStats()
 
     def is_home(self):
@@ -363,7 +354,7 @@ class Game:
     def __init__(self, game_feed):
         self.date = datetime.datetime.strptime(game_feed['gameData']['datetime']['dateTime'],
             '%Y-%m-%dT%H:%M:%SZ').date()
-        away_team = Roster(game_feed['gameData']['teams']['away']['name'], 'away', game_feed['gameData']['teams'] \
+        away_team = Roster(game_feed['gameData']['teams']['away']['name'], 'away', game_feed['gameData']['teams']\
             ['away']['id'])
         home_team = Roster(game_feed['gameData']['teams']['home']['name'], 'away', game_feed['gameData']['teams'] \
             ['home']['id'])
@@ -381,38 +372,17 @@ class Game:
     def add_play(self, play):
         self.game_plays.append(play)
 
-    # TODO this method does more than one thing. figure it out
-
     def fill_rosters(self, player_list):
         for player in player_list:
-            player_name = player_list[player]['fullName']
-            player_type = player_list[player]['primaryPosition']['type']
-            try:
-                current_team = player_list[player]['currentTeam']['name']
-            except KeyError:
-                current_team = None
-            if current_team:
-                for team in self.teams:
-                    if team.team_name == current_team:
-                        self.add_to_team(team, player_name, player_type)
+            current_player = Player(player_list[player]['fullName'])
+            if 'currentTeam' in player_list[player].keys() and player_list[player]['currentTeam']['name'] == self.teams[
+                0].team_name:
+                self.teams[0].team_players.append(current_player)
+            elif 'currentTeam' in player_list[player].keys() and player_list[player]['currentTeam']['name'] == \
+                    self.teams[1].team_name:
+                self.teams[1].team_players.append(current_player)
             else:
-                self.__add_inactive_skater__(player_type, Player(player_name))
-
-    def add_to_team(self, team, player_name, player_type):
-        if player_type != 'Goalie':
-            player = Player(player_name)
-            self.__add_player_to_team__(team, player)
-        else:
-            goalie = Goalie(player_name)
-            self.__add_goalie_to_team__(team, goalie)
-
-    @staticmethod
-    def __add_player_to_team__(team, player):
-        team.team_players.append(player)
-
-    @staticmethod
-    def __add_goalie_to_team__(team, goalie):
-        team.team_goalies.append(goalie)
+                self.__add_inactive__player__(current_player)
 
     def get_team_by_name(self, name):
         for team in self.teams:
@@ -438,25 +408,11 @@ class Game:
         for play in self.game_plays:
             play.parse_play(self.teams)
 
-    def __add_inactive_skater__(self, player_type, skater):
-        if player_type == 'Goalie':
-            self.__add_inactive__goalie__(skater)
-        else:
-            self.__add_inactive__player__(skater)
-
     def __add_inactive__player__(self, player):
         for team in self.teams:
             season_roster = SeasonRoster(team, self.date)
             if season_roster.was_player_on_team(player.name):
                 team.team_players.append(player)
-                break
-
-    def __add_inactive__goalie__(self, player):
-        for team in self.teams:
-            season_roster = SeasonRoster(team, self.date)
-            if season_roster.was_player_on_team(player.name):
-                team.team_goalies.append(Goalie(player.name))
-                break
 
 
 class SeasonRoster:
