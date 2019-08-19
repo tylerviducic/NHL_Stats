@@ -1,6 +1,5 @@
 import requests
 import datetime
-import matplotlib.pyplot as mp
 
 
 # Created by Tyler Viducic
@@ -21,10 +20,9 @@ class Play:
             for player in self.players:
                 if team.is_player_on_team(player['Name']):
                     team.get_player_by_name(player['Name']).update_stats(self.event, player['Type'], self.period,
-                        self.play_coordinates)
+                                                                         self.play_coordinates)
                 elif team.is_goalie_on_team(player['Name']):
-                    team.get_goalie_by_name(player['Name']).update_stats(self.event, player['Type'], self.period,
-                        self.play_coordinates)
+                    team.get_goalie_by_name(player['Name']).update_stats(self.event, player['Type'])
 
     def __add_plays__(self, play_dict):
         for player in play_dict['players']:
@@ -36,7 +34,6 @@ class Play:
             self.period = play_dict['about']['period']
 
 
-# TODO Add goalies
 # TODO add a season class for full season player analysis
 
 class GoalieStats:
@@ -58,8 +55,7 @@ class Goalie:
         self.name = name
         self.stats = GoalieStats()
 
-    def update_stats(self, event, play_type, period, location):
-        # this isn't working as a switch, so if/elif it is.
+    def update_stats(self, event, play_type):
         if event == 'Shot':
             self.__update_shot__(play_type)
         elif event == 'Goal':
@@ -71,7 +67,7 @@ class Goalie:
         Goals Against: {1:>1}
         Save %: {2:>13}
         '''.format(self.stats.saves, self.stats.goals_against,
-            self.stats.saves/(self.stats.saves + self.stats.goals_against)))
+                   self.stats.saves/(self.stats.saves + self.stats.goals_against)))
 
     # Private Methods
 
@@ -153,8 +149,7 @@ class Player:
         Faceoffs: {4:>5}
         FO Won: {5:>7}
         '''.format(len(self.stats.shots) + len(self.stats.goals), len(self.stats.goals), self.stats.assists,
-            self.stats.hits,
-            self.stats.faceoffs_taken, self.stats.faceoffs_won))
+                   self.stats.hits, self.stats.faceoffs_taken, self.stats.faceoffs_won))
 
     def update_stats(self, event, play_type, period, location):
         # this isn't working as a switch, so if/elif it is.
@@ -257,6 +252,8 @@ class TeamStats:
         self.fights = 0
         self.penalty_drawn = 0
         self.penalty_taken = 0
+        self.saves = 0
+        self.goals_against = 0
 
     def update_shot(self, period, location):
         self.shots.append({'period': period, 'location': location})
@@ -290,6 +287,12 @@ class TeamStats:
 
     def update_pen_drawn(self):
         self.penalty_drawn += 1
+
+    def update_saves(self):
+        self.saves += 1
+
+    def update_goals_against(self):
+        self.goals_against += 1
 
 
 class Roster:
@@ -344,11 +347,15 @@ class Roster:
             self.__update_shots__(player)
             self.__update_goals__(player)
             self.__update_faceoffs__(player)
+        for goalie in self.team_goalies:
+            self.__update_saves__(goalie)
+            self.__update_goals_against__(goalie)
 
     def show_team_stats(self):
-        print('Stats for {0}: \n\tShots: {1} \n\tGoals: {2}\n\tFaceoff Win%: {3}'.format(self.team_name,
-            len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
-            (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100))
+        print('Stats for {0}: \n\tShots: {1} \n\tGoals: {2}\n\tFaceoff Win%: {3} \n\tSave%:'.format(self.team_name,
+              len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
+              (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100),
+              self.team_stats.saves/(self.team_stats.goals_against + self.team_stats.saves))
 
     # Private methods
 
@@ -363,6 +370,12 @@ class Roster:
     def __update_faceoffs__(self, player):
         self.team_stats.faceoffs_taken += player.stats.faceoffs_taken
         self.team_stats.faceoffs_won += player.stats.faceoffs_won
+
+    def __update_saves__(self, goalie):
+        self.team_stats.saves += goalie.stats.saves
+
+    def __update_goals_against__(self, goalie):
+        self.team_stats.goals_against += goalie.stats.goals_against
 
 
 class DailySchedule:
@@ -416,11 +429,11 @@ class Game:
 
     def __init__(self, game_feed):
         self.date = datetime.datetime.strptime(game_feed['gameData']['datetime']['dateTime'],
-            '%Y-%m-%dT%H:%M:%SZ').date()
-        away_team = Roster(game_feed['gameData']['teams']['away']['name'], 'away', game_feed['gameData']['teams'] \
-            ['away']['id'])
-        home_team = Roster(game_feed['gameData']['teams']['home']['name'], 'away', game_feed['gameData']['teams'] \
-            ['home']['id'])
+                                               '%Y-%m-%dT%H:%M:%SZ').date()
+        away_team = Roster(game_feed['gameData']['teams']['away']['name'], 'away', game_feed['gameData']['teams']
+                           ['away']['id'])
+        home_team = Roster(game_feed['gameData']['teams']['home']['name'], 'away', game_feed['gameData']['teams']
+                           ['home']['id'])
         self.teams = (home_team, away_team)
         self.game_plays = []
         self.fill_rosters(game_feed['gameData']['players'])
@@ -464,6 +477,20 @@ class Game:
             goalie = Goalie(player_name)
             self.__add_goalie_to_team__(team, goalie)
 
+    def get_team_by_name(self, name):
+        for team in self.teams:
+            if team.team_name == name:
+                return team
+        return None
+
+    def is_team_in_game(self, name):
+        for team in self.teams:
+            if team.team_name == name:
+                return True
+        return False
+
+    # Private Methods
+
     @staticmethod
     def __add_player_to_team__(team, player):
         team.team_players.append(player)
@@ -472,22 +499,10 @@ class Game:
     def __add_goalie_to_team__(team, goalie):
         team.team_goalies.append(goalie)
 
-    def get_team_by_name(self, name):
-        for team in self.teams:
-            if team.team_name == name:
-                return team
-        return Roster("Invalid")
-
-    def is_team_in_game(self, name):
-        for team in self.teams:
-            if team.team_name == name:
-                return True
-        return False
-
     def __ask_user_for_team__(self, player):
         while True:
             player_team = int(input("What team is {0} on?  Enter 1 for {1} or Enter 2 for {2}: ".format(player.name,
-                self.teams[0].team_name, self.teams[1].team_name)))
+                                    self.teams[0].team_name, self.teams[1].team_name)))
             if 3 > player_team > 0:
                 break
         return player_team

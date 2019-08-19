@@ -91,8 +91,8 @@ devils = devils_game.get_team_by_name("New Jersey Devils")
 # for player in devils.team_players:
 #     player.show_stats()
 # #     print(player.name)
-for goalie in devils.team_goalies:
-    goalie.show_stats()
+# for goalie in devils.team_goalies:
+#     goalie.show_stats()
 devils.update_team_stats()
 devils.show_team_stats()
 
