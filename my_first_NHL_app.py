@@ -73,7 +73,7 @@ import numpy as np
 #     if 'players' in play.keys():
 #         game.add_play(scrap.Play(play))
 daily_games = scrap.DailySchedule(2019, 4, 1)
-daily_games.show_all_games()
+# daily_games.show_all_games()
 if daily_games.did_team_play('New Jersey Devils'):
     devils_game = daily_games.get_game_by_teamname('New Jersey Devils')
 
@@ -88,8 +88,8 @@ if daily_games.did_team_play('New Jersey Devils'):
 #    # player.show_stats()
 
 devils = devils_game.get_team_by_name("New Jersey Devils")
-# for player in devils.team_players:
-#     player.show_stats()
+for player in devils.team_players:
+    player.show_stats()
 # #     print(player.name)
 devils.update_team_stats()
 devils.show_team_stats()
