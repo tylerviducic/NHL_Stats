@@ -4,6 +4,9 @@ NHL API Scraper with Python Interface
 In development. Currently can only access data stored in the NHL's API.  There are many limitations with this
 _____________________________________________________________________________________________________________
 
+The script my_first_NHL_app.py should serve as a decent tutorial until I can actually put one together
+_____________________________________________________________________________________________________________
+
 
 Current Functional Classes:
 
