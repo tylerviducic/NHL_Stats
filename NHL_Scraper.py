@@ -382,8 +382,6 @@ class Game:
                     self.teams[1].team_name:
                 self.teams[1].team_players.append(current_player)
             else:
-                # team_index = self.__ask_user_for_team__(current_player)
-                # self.teams[team_index - 1].team_players.append(current_player)
                 self.__add_inactive__player__(current_player)
 
     def get_team_by_name(self, name):

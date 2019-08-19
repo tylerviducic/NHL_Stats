@@ -113,11 +113,11 @@ for player in devils.team_players:
 
 # TODO figure out MATPLOTLIB
 fig, ax1 = plt.subplots()
-img = plt.imread('hockey_rink.jpeg')
+img = plt.imread('bev_rink_v1.jpg')
 ax1.imshow(img, extent=[-100, 100, -43, 43])
 plt.title("{}-{} Shot Map {}".format(devils_game.teams[0].team_name, devils_game.teams[1].team_name, daily_games.date))
 devils_shots = (devils_shots_y, devils_shots_y)
-ax1.plot(devils_shots_x, devils_shots_y, 'ro')
+ax1.plot(devils_shots_x, devils_shots_y, 'ro', marker='>')
 # ax1.plot(np.array(rangers_shots), 'bo')
 
 
