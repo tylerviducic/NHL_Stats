@@ -391,23 +391,22 @@ class Game:
 
     def fill_rosters(self, player_list):
         for player in player_list:
+            player_added = False
             player_name = player_list[player]['fullName']
             player_type = player_list[player]['primaryPosition']['type']
             try:
                 current_team = player_list[player]['currentTeam']['name']
             except KeyError:
                 current_team = None
-            for team in self.teams:
-                if current_team and current_team == team.team_name:
-                    self.add_to_team(team, player_name, player_type)
+            while not player_added:
+                if current_team and current_team in [self.teams[0].team_name, self.teams[1].team_name]:
+                    for team in self.teams:
+                        if current_team == team.team_name:
+                            self.add_to_team(team, player_name, player_type)
+                            player_added = True
                 else:
                     self.__add_inactive_skater__(player_type, Player(player_name))
-            # if current_team:
-            #     for team in self.teams:
-            #         if team.team_name == current_team:
-            #             self.add_to_team(team, player_name, player_type)
-            # else:
-            #     self.__add_inactive_skater__(player_type, Player(player_name))
+                    player_added = True
 
     def add_to_team(self, team, player_name, player_type):
         if player_type != 'Goalie':

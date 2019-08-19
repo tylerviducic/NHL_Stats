@@ -88,8 +88,8 @@ if daily_games.did_team_play('New Jersey Devils'):
 #    # player.show_stats()
 
 devils = devils_game.get_team_by_name("New Jersey Devils")
-for player in devils.team_players:
-    player.show_stats()
+# for player in devils.team_players:
+#     player.show_stats()
 # #     print(player.name)
 devils.update_team_stats()
 devils.show_team_stats()
