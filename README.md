@@ -23,6 +23,10 @@ TeamStats - team stats
 Game - contains the teams and plays for a game
 
 DailySchedule - games played for a given date
+
+Goalie - Key information for a goalie
+
+GoalieStats - Stats for the goalie class
 _____________________________________________________________________________________________________________
 
 
