@@ -14,7 +14,6 @@ class Play:
                                  'y': 0}
         self.__add_plays__(play_dict)
 
-    # TODO make more efficient
     def parse_play(self, teams):
         for team in teams:
             for player in self.players:
@@ -152,7 +151,6 @@ class Player:
                    self.stats.hits, self.stats.faceoffs_taken, self.stats.faceoffs_won))
 
     def update_stats(self, event, play_type, period, location):
-        # this isn't working as a switch, so if/elif it is.
         if event == 'Shot':
             self.__update_shot__(play_type, period, location)
         elif event == 'Faceoff':
@@ -448,8 +446,6 @@ class Game:
     def add_play(self, play):
         self.game_plays.append(play)
 
-    # TODO this method does more than one thing. figure it out
-
     def fill_rosters(self, player_list):
         for player in player_list:
             player_added = False
@@ -461,10 +457,8 @@ class Game:
                 current_team = None
             while not player_added:
                 if current_team and current_team in [self.teams[0].team_name, self.teams[1].team_name]:
-                    for team in self.teams:
-                        if current_team == team.team_name:
-                            self.add_to_team(team, player_name, player_type)
-                            player_added = True
+                    self.__add_from_current_team__(current_team, player_name, player_type)
+                    player_added = True
                 else:
                     self.__add_inactive_skater__(player_type, Player(player_name))
                     player_added = True
@@ -490,6 +484,11 @@ class Game:
         return False
 
     # Private Methods
+
+    def __add_from_current_team__(self, current_team, player_name, player_type):
+        for team in self.teams:
+            if current_team == team.team_name:
+                self.add_to_team(team, player_name, player_type)
 
     @staticmethod
     def __add_player_to_team__(team, player):
