@@ -451,11 +451,9 @@ class Game:
     def add_play(self, play):
         self.game_plays.append(play)
 
-    # TODO currentteam won't work for this because trades. use season roster
     def fill_rosters(self, player_list):
         home_season_roster = SeasonRoster(self.get_home_team(), self.date)
         away_season_roster = SeasonRoster(self.get_away_team(), self.date)
-
         for player in player_list:
             player_name = player_list[player]['fullName']
             player_type = player_list[player]['primaryPosition']['type']
@@ -522,20 +520,6 @@ class Game:
             self.__add_inactive__goalie__(skater)
         else:
             self.__add_inactive__player__(skater)
-
-    def __add_inactive__player__(self, player):
-        for team in self.teams:
-            season_roster = SeasonRoster(team, self.date)
-            if season_roster.was_player_on_team(player.name):
-                team.team_players.append(player)
-                break
-
-    def __add_inactive__goalie__(self, player):
-        for team in self.teams:
-            season_roster = SeasonRoster(team, self.date)
-            if season_roster.was_player_on_team(player.name):
-                team.team_goalies.append(Goalie(player.name))
-                break
 
 
 class SeasonRoster:
