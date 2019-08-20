@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # for play in plays:
 #     if 'players' in play.keys():
 #         game.add_play(scrap.Play(play))
-daily_games = scrap.DailySchedule(2018, 10, 6)
+daily_games = scrap.DailySchedule(2019, 1, 2)
 # daily_games.show_all_games()
 if daily_games.did_team_play('New Jersey Devils'):
     devils_game = daily_games.get_game_by_teamname('New Jersey Devils')
@@ -31,9 +31,9 @@ devils.update_team_stats()
 devils.show_team_stats()
 
 # rangers = devils_game.get_team_by_name("New York Rangers")
-# predators = devils_game.get_home_team()
-# for player in predators.team_players:
-#     player.show_stats()
+predators = devils_game.get_home_team()
+for player in predators.team_players:
+    player.show_stats()
 
 devils_shots_x = []
 devils_shots_y = []

@@ -457,6 +457,8 @@ class Game:
         for player in player_list:
             player_name = player_list[player]['fullName']
             player_type = player_list[player]['primaryPosition']['type']
+            if self.__was_player_traded__(player_name, home_season_roster, away_season_roster):
+                print(player_name)
             if player_name in home_season_roster.players:
                 self.add_to_team(self.teams[0], player_name, player_type)
             elif player_name in away_season_roster.players:
@@ -489,6 +491,11 @@ class Game:
         return False
 
     # Private Methods
+    @staticmethod
+    def __was_player_traded__(player_name, season_roster1, season_roster2):
+        if player_name in season_roster1.players and player_name in season_roster2.players:
+            return True
+        return False
 
     def __add_from_current_team__(self, current_team, player_name, player_type):
         for team in self.teams:
