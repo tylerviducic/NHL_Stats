@@ -352,14 +352,13 @@ class Roster:
     def show_team_stats(self):
         try:
             print('Stats for {0}: \n\tShots: {1} \n\tGoals: {2}\n\tFaceoff Win%: {3} \n\tSave%:'.format(self.team_name,
-                len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
-                (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100),
-                self.team_stats.saves/(self.team_stats.goals_against + self.team_stats.saves))
-        except ZeroDivisionError:
+                  len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
+                  (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100),
+                  self.team_stats.saves/(self.team_stats.goals_against + self.team_stats.saves))
+        except ZeroDivisionError:  # TODO fix division by zero
             print('Stats for {0}: \n\tShots: {1} \n\tGoals: {2}\n\tFaceoff Win%: {3} \n\tSave%:'.format(self.team_name,
-                len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
-                (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100),
-                0)
+                  len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
+                     (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100), 0)
     # Private methods
 
     def __update_shots__(self, player):
@@ -439,10 +438,10 @@ class Game:
                            ['home']['id'])
         self.teams = (home_team, away_team)
         self.game_plays = []
-        self.fill_rosters(game_feed['gameData']['players'])
         for play in game_feed['liveData']['plays']['allPlays']:
             if 'players' in play.keys():
                 self.add_play(Play(play))
+        self.fill_rosters(game_feed)
         self.__parse_plays__()
 
     def add_teams(self, roster1, roster2):
@@ -451,15 +450,17 @@ class Game:
     def add_play(self, play):
         self.game_plays.append(play)
 
-    def fill_rosters(self, player_list):
+    def fill_rosters(self, game_feed):
+        player_list = game_feed['gameData']['players']
         home_season_roster = SeasonRoster(self.get_home_team(), self.date)
         away_season_roster = SeasonRoster(self.get_away_team(), self.date)
         for player in player_list:
             player_name = player_list[player]['fullName']
             player_type = player_list[player]['primaryPosition']['type']
             if self.__was_player_traded__(player_name, home_season_roster, away_season_roster):
-                print(player_name)
-            if player_name in home_season_roster.players:
+                self.__assign_traded_player__(player_name)
+                continue
+            elif player_name in home_season_roster.players:
                 self.add_to_team(self.teams[0], player_name, player_type)
             elif player_name in away_season_roster.players:
                 self.add_to_team(self.teams[1], player_name, player_type)
@@ -496,6 +497,11 @@ class Game:
         if player_name in season_roster1.players and player_name in season_roster2.players:
             return True
         return False
+
+    def __assign_traded_player__(self, player_name):
+        for play in self.game_plays:
+            print(play.)
+            #print(play['team']['name'])
 
     def __add_from_current_team__(self, current_team, player_name, player_type):
         for team in self.teams:
