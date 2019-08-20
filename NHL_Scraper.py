@@ -458,7 +458,7 @@ class Game:
             player_name = player_list[player]['fullName']
             player_type = player_list[player]['primaryPosition']['type']
             if self.__was_player_traded__(player_name, home_season_roster, away_season_roster):
-                self.__assign_traded_player__(player_name)
+                self.__assign_traded_player__(player_name, player_type, game_feed)
                 continue
             elif player_name in home_season_roster.players:
                 self.add_to_team(self.teams[0], player_name, player_type)
@@ -498,14 +498,20 @@ class Game:
             return True
         return False
 
-    def __assign_traded_player__(self, player_name):
-        for play in self.game_plays:
-            print(play.)
-            #print(play['team']['name'])
+    def __assign_traded_player__(self, player_name, player_type, game_feed):
+        ignored_player_types = ['Hittee', 'Loser']
+        for play in game_feed['liveData']['plays']['allPlays']:
+            if 'players' in play.keys():
+                for player in play['players']:
+                    if player_name == player['player']['fullName'] and player['playerType'] not in ignored_player_types:
+                        team_name = play['team']['name']
+                        self.__add_by_team_name__(team_name, player_name, player_type)
+                        return
+        self.__ask_user_for_team__(Player(player_name))
 
-    def __add_from_current_team__(self, current_team, player_name, player_type):
+    def __add_by_team_name__(self, team_name, player_name, player_type):
         for team in self.teams:
-            if current_team == team.team_name:
+            if team_name == team.team_name:
                 self.add_to_team(team, player_name, player_type)
 
     @staticmethod

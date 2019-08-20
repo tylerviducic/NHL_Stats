@@ -28,7 +28,7 @@ for player in devils.team_players:
 # for goalie in devils.team_goalies:
 #     goalie.show_stats()
 devils.update_team_stats()
-devils.show_team_stats()
+# devils.show_team_stats()
 
 # rangers = devils_game.get_team_by_name("New York Rangers")
 predators = devils_game.get_home_team()
@@ -59,7 +59,7 @@ ax1.plot(devils_shots_x, devils_shots_y, 'ro', marker='>')
 # ax1.plot(np.array(rangers_shots), 'bo')
 
 
-plt.show()
+# plt.show()
 
 
 
