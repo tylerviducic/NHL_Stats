@@ -524,8 +524,8 @@ class Game:
 
     def __ask_user_for_team__(self, player):
         while True:
-            player_team = int(input("What team is {0} on?  Enter 1 for {1} or Enter 2 for {2}: ".format(player.name,
-                                    self.teams[0].team_name, self.teams[1].team_name)))
+            player_team = int(input("What team did {0} play for on {1}?  Enter 1 for {2} or Enter 2 for {3}: ".format(
+                                    player.name, self.date, self.teams[0].team_name, self.teams[1].team_name)))
             if 3 > player_team > 0:
                 break
         return player_team
