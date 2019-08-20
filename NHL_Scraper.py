@@ -355,10 +355,10 @@ class Roster:
                   len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
                   (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100),
                   self.team_stats.saves/(self.team_stats.goals_against + self.team_stats.saves))
-        except ZeroDivisionError:  # TODO fix division by zero
-            print('Stats for {0}: \n\tShots: {1} \n\tGoals: {2}\n\tFaceoff Win%: {3} \n\tSave%:'.format(self.team_name,
+        except ZeroDivisionError:  # Print saves instead of save%
+            print('Stats for {0}: \n\tShots: {1} \n\tGoals: {2}\n\tFaceoff Win%: {3} \n\tSaves:'.format(self.team_name,
                   len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
-                     (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100), 0)
+                     (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100), self.team_stats.saves)
     # Private methods
 
     def __update_shots__(self, player):
@@ -459,7 +459,6 @@ class Game:
             player_type = player_list[player]['primaryPosition']['type']
             if self.__was_player_traded__(player_name, home_season_roster, away_season_roster):
                 self.__assign_traded_player__(player_name, player_type, game_feed)
-                continue
             elif player_name in home_season_roster.players:
                 self.add_to_team(self.teams[0], player_name, player_type)
             elif player_name in away_season_roster.players:
@@ -507,7 +506,8 @@ class Game:
                         team_name = play['team']['name']
                         self.__add_by_team_name__(team_name, player_name, player_type)
                         return
-        self.__ask_user_for_team__(Player(player_name))
+        team_number = self.__ask_user_for_team__(Player(player_name))
+        self.teams[team_number - 1].team_players.append(Player(player_name))
 
     def __add_by_team_name__(self, team_name, player_name, player_type):
         for team in self.teams:
