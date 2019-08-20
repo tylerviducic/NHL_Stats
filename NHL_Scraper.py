@@ -350,11 +350,16 @@ class Roster:
             self.__update_goals_against__(goalie)
 
     def show_team_stats(self):
-        print('Stats for {0}: \n\tShots: {1} \n\tGoals: {2}\n\tFaceoff Win%: {3} \n\tSave%:'.format(self.team_name,
-              len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
-              (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100),
-              self.team_stats.saves/(self.team_stats.goals_against + self.team_stats.saves))
-
+        try:
+            print('Stats for {0}: \n\tShots: {1} \n\tGoals: {2}\n\tFaceoff Win%: {3} \n\tSave%:'.format(self.team_name,
+                len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
+                (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100),
+                self.team_stats.saves/(self.team_stats.goals_against + self.team_stats.saves))
+        except ZeroDivisionError:
+            print('Stats for {0}: \n\tShots: {1} \n\tGoals: {2}\n\tFaceoff Win%: {3} \n\tSave%:'.format(self.team_name,
+                len(self.team_stats.shots) + len(self.team_stats.goals), len(self.team_stats.goals),
+                (self.team_stats.faceoffs_won / self.team_stats.faceoffs_taken) * 100),
+                0)
     # Private methods
 
     def __update_shots__(self, player):
@@ -446,22 +451,18 @@ class Game:
     def add_play(self, play):
         self.game_plays.append(play)
 
+    # TODO currentteam won't work for this because trades. use season roster
     def fill_rosters(self, player_list):
+        home_season_roster = SeasonRoster(self.get_home_team(), self.date)
+        away_season_roster = SeasonRoster(self.get_away_team(), self.date)
+
         for player in player_list:
-            player_added = False
             player_name = player_list[player]['fullName']
             player_type = player_list[player]['primaryPosition']['type']
-            try:
-                current_team = player_list[player]['currentTeam']['name']
-            except KeyError:
-                current_team = None
-            while not player_added:
-                if current_team and current_team in [self.teams[0].team_name, self.teams[1].team_name]:
-                    self.__add_from_current_team__(current_team, player_name, player_type)
-                    player_added = True
-                else:
-                    self.__add_inactive_skater__(player_type, Player(player_name))
-                    player_added = True
+            if player_name in home_season_roster.players:
+                self.add_to_team(self.teams[0], player_name, player_type)
+            elif player_name in away_season_roster.players:
+                self.add_to_team(self.teams[1], player_name, player_type)
 
     def add_to_team(self, team, player_name, player_type):
         if player_type != 'Goalie':
@@ -476,6 +477,12 @@ class Game:
             if team.team_name == name:
                 return team
         return None
+
+    def get_home_team(self):
+        return self.teams[0]
+
+    def get_away_team(self):
+        return self.teams[1]
 
     def is_team_in_game(self, name):
         for team in self.teams:
