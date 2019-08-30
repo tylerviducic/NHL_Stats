@@ -11,7 +11,7 @@ class Game:
 
     def __init__(self, game_feed):
         print(game_feed)
-        self.type = self.__get_game_type__(game_feed)
+        self.game_type = self.__get_game_type__(game_feed)
         self.date = datetime.datetime.strptime(game_feed['gameData']['datetime']['dateTime'],
                                                '%Y-%m-%dT%H:%M:%SZ').date()
         away_team = Roster(game_feed['gameData']['teams']['away']['name'], 'away', game_feed['gameData']['teams']
