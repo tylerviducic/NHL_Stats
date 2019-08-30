@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 # TODO make tutorial
 
-games = scrape.DailySchedule(2019, 4, 1)
+games = scrape.DailySchedule(2018, 9, 17)
 if games.did_team_play("New Jersey Devils"):
     devils_game = games.get_game_by_teamname("New Jersey Devils")
 

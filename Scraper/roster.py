@@ -3,7 +3,6 @@ from Scraper.teamStats import TeamStats
 
 class Roster:
 
-    # TODO add a shotmap function
     def __init__(self, team_name, home_away, team_id):
         self.home_away = home_away
         self.team_name = team_name

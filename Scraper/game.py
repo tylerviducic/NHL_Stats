@@ -10,6 +10,8 @@ from Scraper.seasonRoster import SeasonRoster
 class Game:
 
     def __init__(self, game_feed):
+        print(game_feed)
+        self.type = self.__get_game_type__(game_feed)
         self.date = datetime.datetime.strptime(game_feed['gameData']['datetime']['dateTime'],
                                                '%Y-%m-%dT%H:%M:%SZ').date()
         away_team = Roster(game_feed['gameData']['teams']['away']['name'], 'away', game_feed['gameData']['teams']
@@ -113,3 +115,17 @@ class Game:
     def __parse_plays__(self):
         for play in self.game_plays:
             play.parse_play(self.teams)
+
+    def __get_game_type__(self, game_feed):
+        dict_game_type = game_feed['gameData']['game']['type']
+        game_type = self.__parse_game_type__(dict_game_type)
+        return game_type
+
+    @staticmethod
+    def __parse_game_type__(game_type):
+        if game_type == 'R':
+            return 'regular'
+        elif game_type == 'PR':
+            return 'pre'
+        else:
+            return 'playoff'
