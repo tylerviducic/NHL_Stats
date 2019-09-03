@@ -8,3 +8,4 @@ from Scraper.playerSeason import PlayerSeason
 from Scraper.roster import Roster
 from Scraper.seasonRoster import SeasonRoster
 from Scraper.teamStats import TeamStats
+from Scraper.teamSeason import TeamSeason
